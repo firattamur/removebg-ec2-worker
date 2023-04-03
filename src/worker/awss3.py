@@ -49,7 +49,7 @@ class AWSS3:
             print(f"error uploading image to s3: {e}")
             return False
 
-    def download_image(self, s3_key: str) -> Optional[Image]:
+    def download_image(self, s3_key: str) -> Optional[Image.Image]:
         """
         Download image from S3 bucket.
 

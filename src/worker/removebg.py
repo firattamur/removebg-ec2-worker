@@ -1,5 +1,8 @@
 import boto3
-from environment import (
+from rembg import remove
+
+from .awss3 import AWSS3
+from .environment import (
     AWS_ACCESS_KEY_ID,
     AWS_DEFAULT_REGION,
     AWS_S3_BUCKET_NAME,
@@ -7,9 +10,6 @@ from environment import (
     AWS_SNS_TOPIC_NAME,
     AWS_SQS_QUEUE_NAME,
 )
-from rembg import remove
-
-from .awss3 import AWSS3
 
 
 class RemoveBG:
