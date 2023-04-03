@@ -16,7 +16,7 @@ This repository contains the code for the EC2 worker component of the Image Back
 2. Create a virtual environment and activate it by running
 
 ```bash
-python -m venv venv` and `source venv/bin/activate
+python -m venv venv && source venv/bin/activate
 ```
 
 3. Install the required Python dependencies by running
