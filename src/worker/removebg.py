@@ -1,8 +1,10 @@
+import json
+
 import boto3
 from rembg import remove
 
 from .awss3 import AWSS3
-from .environment import (
+from .config import (
     AWS_ACCESS_KEY_ID,
     AWS_DEFAULT_REGION,
     AWS_S3_BUCKET_NAME,
@@ -45,27 +47,27 @@ class RemoveBG:
             aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
         )
 
-    def remove_background(self, s3_key: str):
+    def remove_background(self, s3_key_original: str):
         """
         Remove background from image
 
-        :param s3_key: S3 key of image
+        :param s3_key_original: S3 key of original image
         :return: S3 key of image without background
         """
 
         # Download image from S3
-        image = self.awss3.download_image(s3_key)
+        image = self.awss3.download_image(s3_key_original)
 
         # Remove background from image
         removed_bg_image = remove(image)
 
         # Create new S3 key
-        removed_bg_s3_key = s3_key.replace(".jpg", "_removed_bg.jpg")
+        s3_key_processed = s3_key_original.replace("original", "processed")
 
         # Upload image to S3
-        self.awss3.upload_image(removed_bg_image, s3_key)
+        self.awss3.upload_image(removed_bg_image, s3_key_processed)
 
-        return removed_bg_s3_key
+        return s3_key_processed
 
     def run(self):
         """
@@ -91,20 +93,21 @@ class RemoveBG:
 
                 # Get message
                 message = response["Messages"][0]
-                message_body = message["Body"]
+                message_json = json.loads(message["Body"])
 
                 # Extract S3 key and request ID from message body
-                s3_key, request_id = message_body.split(",")
+                s3_key_original = message_json["s3_key_original"]
+                request_id = message_json["request_id"]
 
                 # Process image
-                print(f"Processing image {s3_key}...")
-                removed_bg_s3_key = self.remove_background(s3_key)
+                print(f"Processing image {s3_key_original}...")
+                s3_key_processed = self.remove_background(s3_key_original)
 
                 # Publish message to SNS
                 print("Publishing message to SNS...")
                 self.sns.publish(
                     TopicArn=AWS_SNS_TOPIC_NAME,
-                    Message=f"{removed_bg_s3_key}, {request_id}",
+                    Message=f"{s3_key_processed}, {request_id}",
                 )
 
                 # Delete message from SQS

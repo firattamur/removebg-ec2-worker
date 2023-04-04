@@ -240,4 +240,7 @@ pyrightconfig.json
 pyvenv.cfg
 pip-selfcheck.json
 
+.config*
+.env*
+
 # End of https://www.toptal.com/developers/gitignore/api/macos,python,venv,packer

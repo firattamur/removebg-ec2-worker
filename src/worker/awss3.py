@@ -1,4 +1,6 @@
+import uuid
 from io import BytesIO
+from mimetypes import guess_type
 from typing import Optional
 
 import boto3
@@ -28,7 +30,7 @@ class AWSS3:
         )
         self.bucket_name = bucket_name
 
-    def upload_image(self, image: Image, s3_key: str) -> bool:
+    def upload_image(self, image: Image, s3_key: Optional[str] = None) -> Optional[str]:
         """
         Upload image to S3 bucket and return S3 key.
 
@@ -37,17 +39,30 @@ class AWSS3:
 
         :return: S3 key of image
         """
+        content_type, _ = guess_type(image.filename)
+
+        if not s3_key:
+            s3_key = f"processed/{str(uuid.uuid4())}.jpg"
+
         try:
             with BytesIO() as output:
-                image.save(output, format="JPEG")
+                image.file.seek(0)
+                output.write(image.file.read())
                 output.seek(0)
-                self.s3.upload_fileobj(output, self.bucket_name, s3_key)
 
-            return True
+                self.s3.upload_fileobj(
+                    output,
+                    self.bucket_name,
+                    s3_key,
+                    ExtraArgs={"ContentType": content_type},
+                )
+
+            return s3_key
 
         except Exception as e:
             print(f"error uploading image to s3: {e}")
-            return False
+
+            return None
 
     def download_image(self, s3_key: str) -> Optional[Image.Image]:
         """
@@ -68,4 +83,5 @@ class AWSS3:
 
         except Exception as e:
             print(f"error downloading image from s3: {e}")
+
             return None
