@@ -20,16 +20,6 @@ variable "ami_prefix" {
   default = "removebg-worker"
 }
 
-source "amazon-ebs" "ubuntu" {
-
-  ami_name      = "${var.ami_prefix}-${local.timestamp}"
-  instance_type = "g5.xlarge"
-  region        = "us-east-1"
-  source_ami    = "ami-0a4caa099fc23090f"
-  ssh_username  = "ubuntu"
-
-}
-
 variable "APP_AWS_DEFAULT_REGION" {
   type = string
   sensitive = true
@@ -60,6 +50,18 @@ variable "APP_AWS_SNS_TOPIC_ARN" {
   sensitive = true
 }
 
+source "amazon-ebs" "ubuntu" {
+
+  access_key = var.APP_AWS_ACCESS_KEY_ID
+  secret_key = var.APP_AWS_SECRET_ACCESS_KEY
+  region     = var.APP_AWS_DEFAULT_REGION
+
+  ami_name      = "${var.ami_prefix}-${local.timestamp}"
+  instance_type = "g5.xlarge"
+  source_ami    = "ami-0a4caa099fc23090f"
+  ssh_username  = "ubuntu"
+
+}
 
 build {
 
