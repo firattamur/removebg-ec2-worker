@@ -41,6 +41,17 @@ jobs:
         id: validate
         run: packer validate worker.pkr.hcl
 
+      - name: Create variables JSON file for `packer build`
+        run: |
+          echo '{
+            "APP_AWS_ACCESS_KEY_ID"     : "${{ secrets.APP_AWS_ACCESS_KEY_ID }}",
+            "APP_AWS_SECRET_ACCESS_KEY" : "${{ secrets.APP_AWS_SECRET_ACCESS_KEY }}",
+            "APP_AWS_DEFAULT_REGION"    : "${{ secrets.APP_AWS_DEFAULT_REGION }}",
+            "APP_AWS_BUCKET_NAME"       : "${{ secrets.APP_AWS_BUCKET_NAME }}",
+            "APP_AWS_SQS_QUEUE_URL"     : "${{ secrets.APP_AWS_SQS_QUEUE_URL }}",
+            "APP_AWS_SNS_TOPIC_ARN"     : "${{ secrets.APP_AWS_SNS_TOPIC_ARN }}"
+          }' > variables.json
+
       - name: Run `packer build`
         id: build
-        run: packer build -var-file=worker.pkrvars.hcl -on-error=abort worker.pkr.hcl
+        run: packer build -var-file=variables.json -on-error=abort worker.pkr.hcl
