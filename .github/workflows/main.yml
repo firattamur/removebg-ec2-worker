@@ -1,0 +1,46 @@
+name: Build AMI with Packer
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  PRODUCT_VERSION: "latest"
+
+jobs:
+
+  packer:
+    runs-on: ubuntu-latest
+    name: Build AMI with Packer
+
+    defaults:
+      run:
+        working-directory: packer
+
+    env:
+      AWS_ACCESS_KEY_ID       : ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_DEFAULT_REGION      : ${{ secrets.AWS_DEFAULT_REGION }}
+      AWS_SECRET_ACCESS_KEY   : ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup `packer`
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: ${{ env.PRODUCT_VERSION }}
+
+      - name: Run `packer init`
+        id: init
+        run: packer init worker.pkr.hcl
+
+      - name: Run `packer validate`
+        id: validate
+        run: packer validate worker.pkr.hcl
+
+      - name: Run `packer build`
+        id: build
+        run: packer build -var-file=worker.pkrvars.hcl -on-error=abort worker.pkr.hcl
