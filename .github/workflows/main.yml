@@ -37,10 +37,6 @@ jobs:
         id: init
         run: packer init worker.pkr.hcl
 
-      - name: Run `packer validate`
-        id: validate
-        run: packer validate worker.pkr.hcl
-
       - name: Create variables JSON file for `packer build`
         run: |
           echo '{
@@ -51,6 +47,10 @@ jobs:
             "APP_AWS_SQS_QUEUE_URL"     : "${{ secrets.APP_AWS_SQS_QUEUE_URL }}",
             "APP_AWS_SNS_TOPIC_ARN"     : "${{ secrets.APP_AWS_SNS_TOPIC_ARN }}"
           }' > variables.json
+
+      - name: Run `packer validate`
+        id: validate
+        run: packer validate -var-file=variables.json worker.pkr.hcl
 
       - name: Run `packer build`
         id: build
