@@ -30,7 +30,7 @@ source "amazon-ebs" "ubuntu" {
 
 }
 
-variable "APP_AWS_REGION" {
+variable "APP_AWS_DEFAULT_REGION" {
   type = string
   sensitive = true
 }
@@ -45,7 +45,7 @@ variable "APP_AWS_SECRET_ACCESS_KEY" {
   sensitive = true
 }
 
-variable "APP_AWS_S3_BUCKET" {
+variable "APP_AWS_BUCKET_NAME" {
   type = string
   sensitive = true
 }
