@@ -67,18 +67,8 @@ build {
   sources = ["source.amazon-ebs.ubuntu"]
 
   provisioner "file" {
-    source      = "../../removebg-worker"
+    source      = "../"
     destination = "/tmp"
-  }
-
-  provisioner "file" {
-    source      = "../setup.sh"
-    destination = "/tmp/setup.sh"
-  }
-
-  provisioner "file" {
-    source      = "../startup.sh"
-    destination = "/home/ubuntu/startup.sh"
   }
 
   provisioner "shell" {
@@ -94,8 +84,8 @@ build {
       "chmod +x /tmp/setup.sh",
       "/tmp/setup.sh",
 
-      "chmod +x /home/ubuntu/startup.sh",
-      "sudo cp /home/ubuntu/startup.sh /etc/init.d/startup_script",
+      "chmod +x /tmp/startup.sh",
+      "sudo cp /tmp/startup.sh /etc/init.d/startup_script",
       "sudo ln -s /etc/init.d/startup_script /etc/rc2.d/S99startup_script",
       "if [ -e /etc/rc.local ]; then",
       "  sudo sed -i '/^exit 0/i \\/etc/init.d/startup_script' /etc/rc.local",
