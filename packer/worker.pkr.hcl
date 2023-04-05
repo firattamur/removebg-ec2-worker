@@ -67,8 +67,8 @@ build {
   sources = ["source.amazon-ebs.ubuntu"]
 
   provisioner "file" {
-    source      = "../"
-    destination = "/home/ubuntu/removebg-worker"
+    source      = "../../removebg-worker"
+    destination = "/tmp"
   }
 
   provisioner "file" {
